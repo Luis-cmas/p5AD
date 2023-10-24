@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta</title>
+</head>
+<body>
+    <h1>Consulta</h1>
+    <label for="ciudadInput">Pais:</label>
+    <input type="text" id="ciudadInput" placeholder="Escribe el nombre del Pais">
+    <button onclick="obtenerDatos()">Consultar</button>
+    <div id="resultado"></div>
+    <div id="resultado2"></div>
+    <div id="resultado3"></div>
+
+    <script>
+        function obtenerDatos() {
+            const ciudad = document.getElementById("ciudadInput").value;
+            const url1 = `http://localhost:9090/listas/${ciudad}`;
+            const url2 = `http://localhost:9090/informacion/${ciudad}`;
+            const url3 = `http://localhost:9090/temperature/${ciudad}`;
+
+            fetch(url1)
+                .then(response => response.json())
+                .then(data => {                         
+                        const listas = data["listas"];
+                        
+                        const resultado = `Pais: ${ciudad}<br>Listas: ${JSON.stringify(listas)}`;
+                        document.getElementById("resultado").innerHTML = resultado;
+                        console.log('entro');
+                        console.log(data);
+                         //aqui empieza la segunda peticion
+                        fetch(url2)
+                            .then(response => response.json())
+                            .then(data => {
+                                
+                                    const coordenadas = data["Informacion"];
+                                    
+                                    const resultado2 = `coordenadas: ${JSON.stringify(coordenadas)}`;
+                                    console.log(data);
+                                    document.getElementById("resultado2").innerHTML = resultado2;
+                                    //tercera peticion
+                                    fetch(url3)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                        
+                                            const temperatura = data["temperature"];
+                                            
+                                            const resultado3 = `coordenadas: ${parseFloat(temperatura).toFixed(2)} °C `;
+                                            console.log(data);
+                                            document.getElementById("resultado3").innerHTML = resultado3;
+                                            //console.log('entro'+data.main);
+                                            
+                                        
+                                        })
+                                    .catch(error => {
+                                        document.getElementById("resultado").innerHTML = "Error: " + error.message;
+                                    });
+                                    
+                            })
+                            .catch(error => {
+                                document.getElementById("resultado").innerHTML = "Error: " + error.message;
+                            });
+                })
+                .catch(error => {
+                    document.getElementById("resultado").innerHTML = "Error: " + error.message;
+                });
+        }
+    </script>
+</body>
+</html>
